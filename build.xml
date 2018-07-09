@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="josm" default="taginfo">
+    <target name="init-properties">
+        <dirname property="base.dir" file="${ant.file.josm}"/>
+        <property name="tools.dir" location="${base.dir}/tools"/>
+        <path id="groovy.classpath">
+            <fileset dir="${tools.dir}/groovy">
+                <include name="*.jar"/>
+            </fileset>
+        </path>
+    </target>
+
+    <macrodef name="_taginfo">
+        <attribute name="type"/>
+        <attribute name="output"/>
+        <sequential>
+            <echo message="Generating Taginfo for type @{type} to @{output}"/>
+            <groovy src="${taginfoextract}" classpath="${toString:groovy.classpath}"/>
+        </sequential>
+    </macrodef>
+
+    <target name="taginfo" depends="init-properties">
+        <!-- http://docs.groovy-lang.org/2.5.0/html/documentation/#_the_groovy_ant_task -->
+        <taskdef name="groovy" classname="org.codehaus.groovy.ant.Groovy" classpathref="groovy.classpath"/>
+        <property name="taginfoextract" value="scripts/TagInfoExtract.groovy"/>
+        <property name="imgurlprefix" value="http://josm.openstreetmap.de/download/taginfo/taginfo-img"/>
+        <_taginfo type="mappaint" output="taginfo_style.json"/>
+        <_taginfo type="presets" output="taginfo_presets.json"/>
+        <_taginfo type="external_presets" output="taginfo_external_presets.json"/>
+    </target>
+</project>
